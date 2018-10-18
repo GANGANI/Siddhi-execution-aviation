@@ -1,0 +1,39 @@
+Manifest-Version: 1.0
+Bnd-LastModified: 1539876073100
+Build-Jdk: 1.8.0_181
+Built-By: gangani
+Bundle-Contributors: WSO2 Inc
+Bundle-Copyright: WSO2 Inc
+Bundle-Description: WSO2 is an open source application development softw
+ are company focused on providing service-orientedarchitecture solutions
+  for professional developers.
+Bundle-Developers: WSO2 Inc
+Bundle-DocURL: https://docs.wso2.com
+Bundle-License: http://www.apache.org/licenses/LICENSE-2.0.txt
+Bundle-ManifestVersion: 2
+Bundle-Name: siddhi-execution-aviation
+Bundle-SymbolicName: siddhi-execution-aviation
+Bundle-Vendor: WSO2 Inc
+Bundle-Version: 1.0.0.SNAPSHOT
+Created-By: Apache Maven Bundle Plugin
+DynamicImport-Package: *
+Export-Package: org.wso2.extension.siddhi.execution.aviation;uses:="org.
+ wso2.siddhi.core.config,org.wso2.siddhi.core.executor,org.wso2.siddhi.c
+ ore.executor.function,org.wso2.siddhi.core.util.config,org.wso2.siddhi.
+ query.api.definition";version="1.0.0",org.wso2.extension.siddhi.executi
+ on.aviation.api;uses:="org.wso2.extension.siddhi.execution.aviation.int
+ ernal.exception,org.wso2.siddhi.core.util.config";version="1.0.0",org.w
+ so2.extension.siddhi.execution.aviation.internal.exception;version="1.0
+ .0",org.wso2.extension.siddhi.execution.aviation.internal.impl;uses:="o
+ rg.wso2.extension.siddhi.execution.aviation.api,org.wso2.extension.sidd
+ hi.execution.aviation.internal.exception,org.wso2.siddhi.core.util.conf
+ ig";version="1.0.0",org.wso2.extension.siddhi.execution.aviation.intern
+ al.utils;uses:="org.wso2.extension.siddhi.execution.aviation.internal.e
+ xception";version="1.0.0"
+Import-Package: org.wso2.siddhi.query.api.definition;version="[4.1,5)",o
+ rg.wso2.siddhi.core.config;version="[4.1,5)",org.wso2.siddhi.core.execu
+ tor;version="[4.1,5)",org.wso2.siddhi.core.executor.function;version="[
+ 4.1,5)",org.wso2.siddhi.core.util.config;version="[4.1,5)"
+Require-Capability: osgi.ee;filter:="(&(osgi.ee=JavaSE)(version=1.8))"
+SCM-Revision: 2018-10-18T15:20:59Z
+Tool: Bnd-3.0.0.201509101326

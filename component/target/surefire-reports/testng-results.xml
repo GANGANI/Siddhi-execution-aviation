@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testng-results skipped="0" failed="0" ignored="0" total="0" passed="0">
+  <reporter-output>
+  </reporter-output>
+  <suite name="Siddhi-Execution-Aviation-Test-Suite" duration-ms="4" started-at="2018-10-18T15:21:12Z" finished-at="2018-10-18T15:21:12Z">
+    <groups>
+    </groups>
+    <test name="Siddhi-execution-aviation-tests" duration-ms="4" started-at="2018-10-18T15:21:12Z" finished-at="2018-10-18T15:21:12Z">
+    </test> <!-- Siddhi-execution-aviation-tests -->
+  </suite> <!-- Siddhi-Execution-Aviation-Test-Suite -->
+</testng-results>

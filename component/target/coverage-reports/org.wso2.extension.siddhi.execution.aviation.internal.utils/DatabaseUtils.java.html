@@ -1,0 +1,149 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>DatabaseUtils.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Siddhi execution of aviation</a> &gt; <a href="index.source.html" class="el_package">org.wso2.extension.siddhi.execution.aviation.internal.utils</a> &gt; <span class="el_source">DatabaseUtils.java</span></div><h1>DatabaseUtils.java</h1><pre class="source lang-java linenums">/*
+*  Copyright (c) 2018, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+*
+*  WSO2 Inc. licenses this file to you under the Apache License,
+*  Version 2.0 (the &quot;License&quot;); you may not use this file except
+*  in compliance with the License.
+*  You may obtain a copy of the License at
+*
+*    http://www.apache.org/licenses/LICENSE-2.0
+*
+* Unless required by applicable law or agreed to in writing,
+* software distributed under the License is distributed on an
+* &quot;AS IS&quot; BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+* KIND, either express or implied.  See the License for the
+* specific language governing permissions and limitations
+* under the License.
+*/
+
+package org.wso2.extension.siddhi.execution.aviation.internal.utils;
+
+import com.zaxxer.hikari.HikariDataSource;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.osgi.framework.BundleContext;
+import org.osgi.framework.FrameworkUtil;
+import org.osgi.framework.ServiceReference;
+import org.wso2.carbon.datasource.core.api.DataSourceService;
+import org.wso2.carbon.datasource.core.exception.DataSourceException;
+import org.wso2.extension.siddhi.execution.aviation.internal.exception.AviationDataResolverException;
+
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
+import javax.sql.DataSource;
+
+/**
+ * This class provides Database Util functionality.
+ */
+public class DatabaseUtils {
+<span class="nc" id="L42">    private static final DatabaseUtils instance = new DatabaseUtils();</span>
+<span class="nc" id="L43">    private static final Log log = LogFactory.getLog(DatabaseUtils.class);</span>
+
+<span class="nc" id="L45">    private DataSource dataSource = null;</span>
+    private String dataSourceName;
+
+<span class="nc" id="L48">    private DatabaseUtils() {</span>
+<span class="nc" id="L49">    }</span>
+
+    public static DatabaseUtils getInstance() {
+<span class="nc" id="L52">        return instance;</span>
+    }
+
+    public void initialize(String dataSourceName) throws AviationDataResolverException {
+        try {
+<span class="nc" id="L57">            BundleContext bundleContext = FrameworkUtil.getBundle(DataSourceService.class).getBundleContext();</span>
+<span class="nc" id="L58">            ServiceReference&lt;DataSourceService&gt; serviceRef = bundleContext.getServiceReference(DataSourceService.class);</span>
+<span class="nc bnc" id="L59" title="All 2 branches missed.">            if (serviceRef == null) {</span>
+<span class="nc" id="L60">                throw new AviationDataResolverException(&quot;Cannot find the datasourceService '&quot; +</span>
+<span class="nc" id="L61">                        DataSourceService.class.getName() + &quot;'&quot;);</span>
+            } else {
+<span class="nc" id="L63">                DataSourceService dataSourceService = bundleContext.getService(serviceRef);</span>
+<span class="nc" id="L64">                dataSource = (HikariDataSource) dataSourceService.getDataSource(dataSourceName);</span>
+<span class="nc bnc" id="L65" title="All 2 branches missed.">                if (log.isDebugEnabled()) {</span>
+<span class="nc" id="L66">                    log.debug(&quot;Lookup for datasource '&quot; + dataSourceName + &quot;' completed through &quot; +</span>
+                            &quot;DataSource Service lookup.&quot;);
+                }
+            }
+<span class="nc" id="L70">        } catch (DataSourceException e) {</span>
+<span class="nc" id="L71">            throw new AviationDataResolverException(&quot;Cannot connect to the datasource '&quot; + dataSourceName + &quot;'&quot;, e);</span>
+<span class="nc" id="L72">        }</span>
+<span class="nc" id="L73">    }</span>
+
+    /**
+     * Utility method to get a new database connection
+     *
+     * @return Connection
+     * @throws SQLException if failed to get Connection
+     */
+    public Connection getConnection() throws SQLException {
+<span class="nc bnc" id="L82" title="All 2 branches missed.">        if (dataSource != null) {</span>
+<span class="nc" id="L83">            return dataSource.getConnection();</span>
+        }
+<span class="nc" id="L85">        throw new SQLException(&quot;Data source is not configured properly.&quot;);</span>
+    }
+
+    /**
+     * Utility method to close the connection streams.
+     *
+     * @param preparedStatement PreparedStatement
+     * @param connection        Connection
+     * @param resultSet         ResultSet
+     */
+    public void closeAllConnections(PreparedStatement preparedStatement, Connection connection,
+                                    ResultSet resultSet) {
+<span class="nc" id="L97">        closeResultSet(resultSet);</span>
+<span class="nc" id="L98">        closeStatement(preparedStatement);</span>
+<span class="nc" id="L99">        closeConnection(connection);</span>
+<span class="nc" id="L100">    }</span>
+
+    /**
+     * Close Connection
+     *
+     * @param dbConnection Connection
+     */
+    private void closeConnection(Connection dbConnection) {
+<span class="nc bnc" id="L108" title="All 2 branches missed.">        if (dbConnection != null) {</span>
+            try {
+<span class="nc" id="L110">                dbConnection.close();</span>
+<span class="nc" id="L111">            } catch (SQLException e) {</span>
+<span class="nc" id="L112">                log.error(&quot;Couldn't close connection&quot;, e);</span>
+<span class="nc" id="L113">            }</span>
+        }
+<span class="nc" id="L115">    }</span>
+
+    /**
+     * Close ResultSet
+     *
+     * @param resultSet ResultSet
+     */
+    private void closeResultSet(ResultSet resultSet) {
+<span class="nc bnc" id="L123" title="All 2 branches missed.">        if (resultSet != null) {</span>
+            try {
+<span class="nc" id="L125">                resultSet.close();</span>
+<span class="nc" id="L126">            } catch (SQLException e) {</span>
+<span class="nc" id="L127">                log.error(&quot;Couldn't close ResultSet&quot;, e);</span>
+<span class="nc" id="L128">            }</span>
+        }
+
+<span class="nc" id="L131">    }</span>
+
+    /**
+     * Close PreparedStatement
+     *
+     * @param preparedStatement PreparedStatement
+     */
+    private void closeStatement(Statement preparedStatement) {
+<span class="nc bnc" id="L139" title="All 2 branches missed.">        if (preparedStatement != null) {</span>
+            try {
+<span class="nc" id="L141">                preparedStatement.close();</span>
+<span class="nc" id="L142">            } catch (SQLException e) {</span>
+<span class="nc" id="L143">                log.error(&quot;Couldn't close Statement&quot;, e);</span>
+<span class="nc" id="L144">            }</span>
+        }
+
+<span class="nc" id="L147">    }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.7.8.201612092310</span></div></body></html>

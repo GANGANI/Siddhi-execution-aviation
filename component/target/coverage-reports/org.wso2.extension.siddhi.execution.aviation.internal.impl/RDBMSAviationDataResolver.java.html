@@ -1,0 +1,119 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>RDBMSAviationDataResolver.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Siddhi execution of aviation</a> &gt; <a href="index.source.html" class="el_package">org.wso2.extension.siddhi.execution.aviation.internal.impl</a> &gt; <span class="el_source">RDBMSAviationDataResolver.java</span></div><h1>RDBMSAviationDataResolver.java</h1><pre class="source lang-java linenums">/*
+*  Copyright (c) 2018, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+*
+*  WSO2 Inc. licenses this file to you under the Apache License,
+*  Version 2.0 (the &quot;License&quot;); you may not use this file except
+*  in compliance with the License.
+*  You may obtain a copy of the License at
+*
+*    http://www.apache.org/licenses/LICENSE-2.0
+*
+* Unless required by applicable law or agreed to in writing,
+* software distributed under the License is distributed on an
+* &quot;AS IS&quot; BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+* KIND, either express or implied.  See the License for the
+* specific language governing permissions and limitations
+* under the License.
+*/
+
+package org.wso2.extension.siddhi.execution.aviation.internal.impl;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.wso2.extension.siddhi.execution.aviation.api.AviationData;
+import org.wso2.extension.siddhi.execution.aviation.internal.exception.AviationDataResolverException;
+import org.wso2.extension.siddhi.execution.aviation.internal.utils.DatabaseUtils;
+import org.wso2.siddhi.core.util.config.ConfigReader;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.concurrent.atomic.AtomicBoolean;
+
+/**
+ * This is the implementation class that provides the RDBMS based approach to get country,city based on the ip.
+ */
+<span class="nc" id="L36">public class RDBMSAviationDataResolver {</span>
+<span class="nc" id="L37">    private static final Log log = LogFactory.getLog(RDBMSAviationDataResolver.class);</span>
+<span class="nc" id="L38">    private static final RDBMSAviationDataResolver instance = new RDBMSAviationDataResolver();</span>
+
+    private static final String CONFIG_KEY_ISPERSIST_IN_DATABASE = &quot;isPersistInDatabase&quot;;
+    private static final String CONFIG_KEY_DATASOURCE = &quot;datasource&quot;;
+    private static final String DEFAULT_DATASOURCE_NAME = &quot;aviationDB&quot;;
+
+<span class="nc" id="L44">    private AtomicBoolean isInitialized = new AtomicBoolean(false);</span>
+    private DatabaseUtils dbUtils;
+    private boolean isPersistInDatabase;
+
+    private static final String SQL_SELECT_FLIGHTCOUNT_FROM_FLIGHTS = &quot;SELECT Flight FROM &quot; +
+            &quot;Flights WHERE FlightTo = ? AND FlightFrom = ? AND Arrival &lt; ?  AND Departure &gt; ?&quot;;
+
+    public static RDBMSAviationDataResolver getInstance() {
+<span class="nc" id="L52">        return instance;</span>
+    }
+
+    public void init(ConfigReader configReader) throws AviationDataResolverException {
+<span class="nc" id="L56">        log.info(&quot;klkl&quot;);</span>
+<span class="nc bnc" id="L57" title="All 2 branches missed.">        if (isInitialized.get()) {</span>
+<span class="nc" id="L58">            return;</span>
+        }
+<span class="nc" id="L60">        isPersistInDatabase = Boolean.parseBoolean(configReader.readConfig(CONFIG_KEY_ISPERSIST_IN_DATABASE, &quot;true&quot;));</span>
+
+<span class="nc" id="L62">        dbUtils = DatabaseUtils.getInstance();</span>
+<span class="nc" id="L63">        dbUtils.initialize(configReader.readConfig(CONFIG_KEY_DATASOURCE, DEFAULT_DATASOURCE_NAME));</span>
+<span class="nc" id="L64">        isInitialized.set(true);</span>
+<span class="nc" id="L65">    }</span>
+
+    public AviationData getAviationData(String currentLocation, String lastLocation,
+                                        String currentLoginTime, String lastLoginTime) {
+<span class="nc" id="L69">        AviationData aviationData = null;</span>
+<span class="nc" id="L70">        Connection connection = null;</span>
+        try {
+<span class="nc" id="L72">            connection = dbUtils.getConnection();</span>
+<span class="nc" id="L73">            aviationData = loadAviationData(currentLocation, lastLocation,</span>
+                        currentLoginTime, lastLoginTime, connection);
+<span class="nc" id="L75">        } catch (SQLException e) {</span>
+<span class="nc" id="L76">            log.error(&quot;Cannot retrieve the location from database&quot;, e);</span>
+        } finally {
+<span class="nc" id="L78">            log.info(&quot;ttt&quot;);</span>
+<span class="nc" id="L79">            dbUtils.closeAllConnections(null, connection, null);</span>
+<span class="nc" id="L80">        }</span>
+<span class="nc" id="L81">        return aviationData;</span>
+    }
+
+    /**
+     * Calls external system or database database to find the IPv6 adress to location details.
+     * Can be used by an extended class.
+     * @param currentLocation currentLocation
+     * @param lastLocation lastLocation
+     * @param currentLoginTime currentLoginTime
+     * @param lastLoginTime lastLoginTime
+     * @param connection the Db connection to be used. Do not close this connection within this method.
+     * @return null
+     */
+    private AviationData loadAviationData(String currentLocation, String lastLocation,
+                                          String currentLoginTime, String lastLoginTime,
+                                          Connection connection) throws SQLException {
+<span class="nc" id="L97">        AviationData aviationData = null;</span>
+<span class="nc" id="L98">        PreparedStatement statement = null;</span>
+<span class="nc" id="L99">        ResultSet resultSet = null;</span>
+        try {
+<span class="nc bnc" id="L101" title="All 2 branches missed.">            if (isPersistInDatabase) {</span>
+<span class="nc" id="L102">                statement = connection.prepareStatement(SQL_SELECT_FLIGHTCOUNT_FROM_FLIGHTS);</span>
+<span class="nc" id="L103">                statement.setString(1, currentLocation);</span>
+<span class="nc" id="L104">                statement.setString(2, lastLocation);</span>
+<span class="nc" id="L105">                statement.setInt(3, Integer.parseInt(currentLoginTime));</span>
+<span class="nc" id="L106">                statement.setInt(4, Integer.parseInt(lastLoginTime));</span>
+<span class="nc" id="L107">                resultSet = statement.executeQuery();</span>
+            }
+<span class="nc bnc" id="L109" title="All 4 branches missed.">            if (resultSet != null &amp;&amp; resultSet.next()) {</span>
+<span class="nc" id="L110">                log.warn(resultSet.getString(1));</span>
+<span class="nc" id="L111">                aviationData = new AviationData(resultSet.getString(1));</span>
+            }
+        } finally {
+<span class="nc" id="L114">            dbUtils.closeAllConnections(statement, null, resultSet);</span>
+<span class="nc" id="L115">        }</span>
+<span class="nc" id="L116">        return aviationData;</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.7.8.201612092310</span></div></body></html>

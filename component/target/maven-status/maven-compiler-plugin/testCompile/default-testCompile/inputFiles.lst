@@ -1,0 +1,5 @@
+/home/gangani/Desktop/siddhi-execution-aviation/component/src/test/java/org/wso2/extension/siddhi/execution/aviation/window/TestCaseOfAviationWindow.java
+/home/gangani/Desktop/siddhi-execution-aviation/component/src/test/java/org/wso2/extension/siddhi/execution/aviation/streamprocessor/TestCaseOfAviationStreamProcessor.java
+/home/gangani/Desktop/siddhi-execution-aviation/component/src/test/java/org/wso2/extension/siddhi/execution/aviation/function/TestCaseOfFindFlight.java
+/home/gangani/Desktop/siddhi-execution-aviation/component/src/test/java/org/wso2/extension/siddhi/execution/aviation/streamfunction/TestCaseOfAviationStreamFunction.java
+/home/gangani/Desktop/siddhi-execution-aviation/component/src/test/java/org/wso2/extension/siddhi/execution/aviation/aggregate/TestCaseOfAviationAggregateFunction.java

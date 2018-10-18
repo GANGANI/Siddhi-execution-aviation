@@ -1,0 +1,157 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>FindFlight.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Siddhi execution of aviation</a> &gt; <a href="index.source.html" class="el_package">org.wso2.extension.siddhi.execution.aviation</a> &gt; <span class="el_source">FindFlight.java</span></div><h1>FindFlight.java</h1><pre class="source lang-java linenums">package org.wso2.extension.siddhi.execution.aviation;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.wso2.extension.siddhi.execution.aviation.api.AviationData;
+import org.wso2.extension.siddhi.execution.aviation.api.AviationDataResolver;
+import org.wso2.extension.siddhi.execution.aviation.internal.exception.AviationDataResolverException;
+import org.wso2.siddhi.annotation.Example;
+import org.wso2.siddhi.annotation.Extension;
+import org.wso2.siddhi.annotation.Parameter;
+import org.wso2.siddhi.annotation.ReturnAttribute;
+import org.wso2.siddhi.annotation.util.DataType;
+import org.wso2.siddhi.core.config.SiddhiAppContext;
+import org.wso2.siddhi.core.executor.ExpressionExecutor;
+import org.wso2.siddhi.core.executor.function.FunctionExecutor;
+import org.wso2.siddhi.core.util.config.ConfigReader;
+import org.wso2.siddhi.query.api.definition.Attribute;
+
+import java.util.Map;
+
+/**
+ * This is a sample class-level comment, explaining what the extension class does.
+ */
+
+@Extension(
+        name = &quot;FindFlightAvailability&quot;,
+        namespace = &quot;aviation&quot;,
+        description = &quot;Returns whether the flight is available or not&quot;,
+        parameters = {
+                @Parameter(
+                        name = &quot;current.location&quot;,
+                        description = &quot;current login location&quot;,
+                        type = {DataType.STRING}),
+                @Parameter(
+                        name = &quot;last.location&quot;,
+                        description = &quot;current login location&quot;,
+                        type = {DataType.STRING}),
+                @Parameter(
+                        name = &quot;current.login.time&quot;,
+                        description = &quot;current login Time&quot;,
+                        type = {DataType.STRING}),
+                @Parameter(
+                        name = &quot;last.login.time&quot;,
+                        description = &quot;current login Time&quot;,
+                        type = {DataType.STRING})
+        },
+        returnAttributes = @ReturnAttribute(
+                description = &quot;Check if there is any available fligh among two locations within that time period&quot;,
+                type = {DataType.BOOL}),
+        examples = @Example(
+                description = &quot;This will return the flight count among the two locations within the given time period&quot;,
+                syntax = &quot;define stream FlightStream(current.location string,last.location string,&quot; +
+                        &quot;current.login.time string,last.login.time string);\n&quot; +
+                        &quot;from FlightStream\n&quot; +
+                        &quot;select geo:FindFlightAvailability(current.location,last.location,&quot; +
+                        &quot;current.login.time,last.login.time) as flightcount \n&quot; +
+                        &quot;insert into outputStream;&quot;)
+)
+<span class="nc" id="L59">public class FindFlight extends FunctionExecutor {</span>
+
+<span class="nc" id="L61">    private static final Log log = LogFactory.getLog(FindFlight.class);</span>
+    private AviationDataResolver aviationDataResolverImpl;
+
+
+    /**
+     * The initialization method for {@link FunctionExecutor}, which will be called before other methods and validate
+     * the all configuration and getting the initial values.
+     *
+     * @param attributeExpressionExecutors are the executors of each attributes in the Function
+     * @param configReader                 this hold the {@link FunctionExecutor} extensions configuration reader.
+     * @param siddhiAppContext             Siddhi app runtime context
+     */
+    @Override
+    protected void init(ExpressionExecutor[] attributeExpressionExecutors, ConfigReader configReader,
+                        SiddhiAppContext siddhiAppContext) {
+<span class="nc" id="L76">        log.warn(&quot;jjjjjjjjjjjjjjjjjjjjj&quot;);</span>
+        try {
+<span class="nc" id="L78">            aviationDataResolverImpl = (AviationDataResolver) Class.forName(&quot;org.wso2.extension.siddhi.execution.&quot; +</span>
+<span class="nc" id="L79">                    &quot;aviation.internal.impl.DefaultDBBasedAviationDataResolver&quot;).newInstance();</span>
+<span class="nc" id="L80">            aviationDataResolverImpl.init(configReader);</span>
+<span class="nc" id="L81">        } catch (InstantiationException e) {</span>
+<span class="nc" id="L82">            log.error(&quot;instantiaiton error&quot;);</span>
+<span class="nc" id="L83">        } catch (IllegalAccessException e) {</span>
+<span class="nc" id="L84">            log.error(&quot;illigal actionn error&quot;);</span>
+<span class="nc" id="L85">        } catch (ClassNotFoundException e) {</span>
+<span class="nc" id="L86">            log.error(&quot;class not found&quot;);</span>
+<span class="nc" id="L87">        } catch (AviationDataResolverException e) {</span>
+<span class="nc" id="L88">            log.error(&quot;avaiation error&quot;);</span>
+<span class="nc" id="L89">        }</span>
+<span class="nc" id="L90">    }</span>
+
+    /**
+     * The main execution method which will be called upon event arrival
+     * when there are more than one Function parameter
+     *
+     * @param data the runtime values of Function parameters
+     * @return the Function result
+     */
+    @Override
+    protected Object execute(Object[] data) {
+        AviationData aviationData;
+<span class="nc" id="L102">        String currentLocation = data[0].toString();</span>
+<span class="nc" id="L103">        String lastLocation = data[1].toString();</span>
+<span class="nc" id="L104">        String currentLoginTime = data[2].toString();</span>
+<span class="nc" id="L105">        String lastLoginTime = data[3].toString();</span>
+<span class="nc" id="L106">        aviationData = aviationDataResolverImpl.getAviationDataInfo(currentLocation,</span>
+                lastLocation, currentLoginTime, lastLoginTime);
+<span class="nc bnc" id="L108" title="All 4 branches missed.">        return aviationData != null &amp;&amp; !aviationData.getflight().equals(&quot;&quot;);</span>
+    }
+
+    /**
+     * The main execution method which will be called upon event arrival
+     * when there are zero or one Function parameter
+     *
+     * @param data null if the Function parameter count is zero or
+     *             runtime data value of the Function parameter
+     * @return the Function result
+     */
+    @Override
+    protected Object execute(Object data) {
+<span class="nc" id="L121">        return null;</span>
+    }
+
+    /**
+     * return a Class object that represents the formal return type of the method represented by this Method object.
+     *
+     * @return the return type for the method this object represents
+     */
+    @Override
+    public Attribute.Type getReturnType() {
+<span class="nc" id="L131">        return Attribute.Type.BOOL;</span>
+    }
+
+    /**
+     * Used to collect the serializable state of the processing element, that need to be
+     * persisted for reconstructing the element to the same state on a different point of time
+     *
+     * @return stateful objects of the processing element as an map
+     */
+    @Override
+    public Map&lt;String, Object&gt; currentState() {
+<span class="nc" id="L142">        return null;</span>
+    }
+
+    /**
+     * Used to restore serialized state of the processing element, for reconstructing
+     * the element to the same state as if was on a previous point of time.
+     *
+     * @param state the stateful objects of the processing element as a map.
+     *              This is the same map that is created upon calling currentState() method.
+     */
+    @Override
+    public void restoreState(Map&lt;String, Object&gt; state) {
+
+<span class="nc" id="L155">    }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.7.8.201612092310</span></div></body></html>

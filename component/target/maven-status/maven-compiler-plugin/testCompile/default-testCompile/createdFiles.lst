@@ -1,0 +1,5 @@
+org/wso2/extension/siddhi/execution/aviation/function/TestCaseOfFindFlight.class
+org/wso2/extension/siddhi/execution/aviation/streamfunction/TestCaseOfAviationStreamFunction.class
+org/wso2/extension/siddhi/execution/aviation/window/TestCaseOfAviationWindow.class
+org/wso2/extension/siddhi/execution/aviation/aggregate/TestCaseOfAviationAggregateFunction.class
+org/wso2/extension/siddhi/execution/aviation/streamprocessor/TestCaseOfAviationStreamProcessor.class

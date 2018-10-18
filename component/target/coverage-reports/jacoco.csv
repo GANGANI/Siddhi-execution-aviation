@@ -1,0 +1,7 @@
+GROUP,PACKAGE,CLASS,INSTRUCTION_MISSED,INSTRUCTION_COVERED,BRANCH_MISSED,BRANCH_COVERED,LINE_MISSED,LINE_COVERED,COMPLEXITY_MISSED,COMPLEXITY_COVERED,METHOD_MISSED,METHOD_COVERED
+Siddhi execution of aviation,org.wso2.extension.siddhi.execution.aviation.api,AviationData,9,0,0,0,4,0,2,0,2,0
+Siddhi execution of aviation,org.wso2.extension.siddhi.execution.aviation.internal.exception,AviationDataResolverException,9,0,0,0,4,0,2,0,2,0
+Siddhi execution of aviation,org.wso2.extension.siddhi.execution.aviation.internal.impl,DefaultDBBasedAviationDataResolver,27,0,2,0,7,0,5,0,4,0
+Siddhi execution of aviation,org.wso2.extension.siddhi.execution.aviation.internal.impl,RDBMSAviationDataResolver,173,0,8,0,39,0,10,0,6,0
+Siddhi execution of aviation,org.wso2.extension.siddhi.execution.aviation,FindFlight,88,0,4,0,26,0,10,0,8,0
+Siddhi execution of aviation,org.wso2.extension.siddhi.execution.aviation.internal.utils,DatabaseUtils,140,0,12,0,44,0,15,0,9,0
